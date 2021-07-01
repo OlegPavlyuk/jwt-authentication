@@ -1,8 +1,22 @@
+const { validationResult } = require("express-validator");
 const userService = require("../services/user-service");
 
 class UserController {
   async registration(req, res, next) {
     try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        next(
+          new Error(
+            `Bad request: ${errors
+              .array()
+              .map((err) => `${err.param} - ${err.msg}`)}`
+          )
+        );
+        return;
+      }
+
       const { email, password } = req.body;
       const userData = await userService.registration(email, password);
 
