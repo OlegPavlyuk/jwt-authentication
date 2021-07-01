@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/user-model");
 const UserDto = require("../dtos/user-dto");
+const tokenService = require("./token-service");
 
 class UserService {
   async registration(email, password) {
@@ -13,8 +14,9 @@ class UserService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await UserModel.create({ email, password: hashedPassword });
     const userData = new UserDto(user);
+    const token = tokenService.generateToken({ ...userData });
 
-    return userData;
+    return { token, user: userData };
   }
 
   async login(email, password) {
@@ -31,8 +33,9 @@ class UserService {
     }
 
     const userData = new UserDto(user);
+    const token = tokenService.generateToken({ ...userData });
 
-    return userData;
+    return { token, user: userData };
   }
 
   async getUsers() {
