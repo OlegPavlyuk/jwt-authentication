@@ -15,7 +15,7 @@ app.use("/api", router);
 app.use((err, req, res, next) => {
   console.log(err);
 
-  return res.status(500).json({ message: "Something went wrong" });
+  return res.status(500).json({ message: err.message });
 });
 
 const start = async () => {
