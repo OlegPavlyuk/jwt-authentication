@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const router = require("./router/index");
+const errorMiddleware = require("./middlewares/error-middleware");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -11,12 +12,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api", router);
 
-// Error handling
-app.use((err, req, res, next) => {
-  console.log(err);
-
-  return res.status(500).json({ message: err.message });
-});
+app.use(errorMiddleware);
 
 const start = async () => {
   try {

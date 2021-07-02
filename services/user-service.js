@@ -2,13 +2,14 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/user-model");
 const UserDto = require("../dtos/user-dto");
 const tokenService = require("./token-service");
+const ApiError = require("../exceptions/api-error");
 
 class UserService {
   async registration(email, password) {
     const candidate = await UserModel.findOne({ email });
 
     if (candidate) {
-      throw new Error(`User with email: ${email} already exist`);
+      throw ApiError.BadRequest(`User with email: ${email} already exists`);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,13 +24,13 @@ class UserService {
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-      throw new Error(`User with email: ${email} not found`);
+      throw ApiError.BadRequest(`Wrong credentials`);
     }
 
     const isPasswordsEqual = await bcrypt.compare(password, user.password);
 
     if (!isPasswordsEqual) {
-      throw new Error(`Wrong password`);
+      throw ApiError.BadRequest(`Wrong credentials`);
     }
 
     const userData = new UserDto(user);
